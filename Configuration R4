@@ -1,0 +1,92 @@
+/*
+ * Assignment 50 complete PHY target for R4.
+ * Complete target derived from the verified VIR appliance baseline.
+ * Use load override only after physical identity, port mapping and baseline verification.
+ */
+version 12.1X47-D15.4;
+system {
+    host-name SRX-A2;
+    root-authentication {
+        encrypted-password "$1$xH9xJoL6$MFOUYnZr4.Qj2NM24XInz/";
+    }
+}
+interfaces {
+    ge-0/0/2 {
+        unit 0 {
+            family inet {
+                address 10.10.10.2/28;
+            }
+        }
+    }
+    ge-0/0/3 {
+        unit 0 {
+            family inet {
+                address 10.10.11.2/28;
+            }
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 192.168.100.2/32;
+            }
+        }
+    }
+}
+security {
+    policies {
+        from-zone R4_trust to-zone R4_trust {
+            policy default-permit {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+    }
+    zones {
+        security-zone R4_trust {
+            interfaces {
+                ge-0/0/2.0 {
+                    host-inbound-traffic {
+                        system-services { ping; }
+                        protocols { ospf; }
+                    }
+                }
+                ge-0/0/3.0 {
+                    host-inbound-traffic {
+                        system-services { ping; }
+                        protocols { ospf; }
+                    }
+                }
+                lo0.0 {
+                    host-inbound-traffic {
+                        system-services { ping; }
+                    }
+                }
+            }
+        }
+    }
+}
+routing-options {
+    router-id 192.168.100.2;
+}
+protocols {
+    ospf {
+        area 0.0.0.0 {
+            interface ge-0/0/2.0 {
+                priority 100;
+            }
+            interface ge-0/0/3.0 {
+                priority 200;
+            }
+            interface lo0.0 {
+                passive;
+            }
+        }
+    }
+}
