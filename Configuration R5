@@ -43,26 +43,17 @@ interfaces {
 }
 protocols {
     ospf {
-        export my-route-to-USERLAN3;
         area 0.0.0.0 {
             interface lo0;
-            interface ge-0/0/2.0;
-            interface ge-0/0/3.0;
-        }
-    }
-}
-policy-options {
-    policy-statement my-route-to-USERLAN3 {
-        term accept-my-route-to-USERLAN3 {
-            from {
-                /* match type examples: */
-                /* exact    - 192.168.15.0/24 exact    */
-                /* orlonger - 192.168.15.0/24 orlonger */
-                /* longer   - 192.168.15.0/24 longer   */
-                /* upto     - 192.168.15.0/24 upto     */
-                route-filter 192.168.15.0/24 exact;
+            interface ge-0/0/2.0 {
+                interface-type p2p;
             }
-            then accept;
+            interface ge-0/0/3.0 {
+                interface-type p2p;
+            }
+            interface ge-0/0/4.0 {
+                passive;
+            }
         }
     }
 }
