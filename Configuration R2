@@ -1,0 +1,96 @@
+/*
+ * Assignment 51 complete PHY target for R2.
+ * Complete target derived from the verified VIR appliance baseline.
+ * Use load override only after physical identity, port mapping and baseline verification.
+ */
+version 12.1X47-D15.4;
+system {
+    host-name SRX-A1;
+    root-authentication {
+        encrypted-password "$1$xH9xJoL6$MFOUYnZr4.Qj2NM24XInz/";
+    }
+}
+interfaces {
+    ge-0/0/1 {
+        unit 0 {
+            family inet {
+                address 10.10.12.2/28;
+            }
+        }
+    }
+    ge-0/0/2 {
+        unit 0 {
+            family inet {
+                address 10.10.10.1/28;
+            }
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 192.168.100.1/32;
+            }
+        }
+    }
+}
+routing-options {
+    router-id 192.168.100.1;
+}
+protocols {
+    ospf {
+        traceoptions {
+            file my-ospf-log size 1m files 3;
+            flag state;
+        }
+        area 0.0.0.0 {
+            interface ge-0/0/1.0 {
+                priority 200;
+            }
+            interface ge-0/0/2.0 {
+                priority 200;
+            }
+            interface lo0.0 {
+                passive;
+            }
+        }
+    }
+}
+security {
+    policies {
+        from-zone R2_trust to-zone R2_trust {
+            policy default-permit {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+    }
+    zones {
+        security-zone R2_trust {
+            interfaces {
+                ge-0/0/1.0 {
+                    host-inbound-traffic {
+                        system-services { ping; }
+                        protocols { ospf; }
+                    }
+                }
+                ge-0/0/2.0 {
+                    host-inbound-traffic {
+                        system-services { ping; }
+                        protocols { ospf; }
+                    }
+                }
+                lo0.0 {
+                    host-inbound-traffic {
+                        system-services { ping; }
+                    }
+                }
+            }
+        }
+    }
+}
