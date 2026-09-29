@@ -2,7 +2,7 @@
 /* User: root Password: Rootpass */
 version 12.1X47-D15.4;
 system {
-    host-name R2;
+    host-name R1;
     /* User: root Password: Rootpass */
     root-authentication {
         encrypted-password "$1$xH9xJoL6$MFOUYnZr4.Qj2NM24XInz/";
@@ -43,21 +43,15 @@ interfaces {
 }
 protocols {
     ospf {
-        export my-route-to-USERLAN1;
         area 0.0.0.0 {
             interface lo0;
-            interface ge-0/0/1.0;
-            interface ge-0/0/2.0;
-        }
-    }
-}
-policy-options {
-    policy-statement my-route-to-USERLAN1 {
-        term accept-my-route-to-USERLAN1 {
-            from {
-                route-filter 192.168.13.0/24 exact;
+            interface ge-0/0/1.0 {
+                interface-type p2p;
             }
-            then accept;
+            interface ge-0/0/2.0;
+            interface ge-0/0/4.0 {
+                passive;
+            }
         }
     }
 }
